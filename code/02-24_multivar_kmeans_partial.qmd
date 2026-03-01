@@ -67,7 +67,7 @@ k-means:
 - Does not handle NAs  
 
 
-k-means is useful when clusters are circular, but can fail badly when clusters have odd shapes or outliers.  
+k-means is useful when clusters are circular, but can fail badly when clusters have odd shapes (squares, circle within circle, i.e., one cluster is subset of another =) or outliers.  
 
 ```{r clustering algorithms comparison}
 knitr::include_graphics("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf8Q.png")
@@ -75,12 +75,17 @@ knitr::include_graphics("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf
 ```
 
 k-means does not normalize our data for us like PCA did, so we will need to do that before running the model.  
+If some variables have very high magnitude and is important and you want to give more weight, may be do not normalize but usually we normalize.
 
 ```{r}
 # normalizing the data
-weather_norm  
+weather_norm  <- weather_n %>% 
+  mutate(across(everything(), ~scale(.x)))
+  
 
 weather_norm
+
+summary(weather_norm)
 ```
 
 Also, we need to define the number of clusters we want.  
@@ -88,7 +93,10 @@ Any thoughts?
 Let's try 2.  
 
 ```{r kmeans model }
-mod_km 
+mod_km <- kmeans(weather_norm, 
+                 centers = 6,
+                 nstart = 10
+                 )
 
 mod_km
 ```
@@ -97,6 +105,12 @@ Since the choice of k can be subjective, we will need to find an objective way t
 
 ```{r choosing k - total error}
 # Total error x k
+fviz_nbclust(weather_norm,
+             method = "wss",   #within sum of squares methods
+             k.max = 10,
+             FUNcluster = kmeans      #FUNction of clustering
+             )
+
 
 ```
 
@@ -116,7 +130,10 @@ silhouette: k=4
 Let's go with 4 clusters.  
 
 ```{r mod_km4 }
-mod_km4 
+mod_km4 <- kmeans(weather_norm,
+                  centers = 4,
+                  nstart = 10
+                  )
 
 mod_km4
 ```
@@ -124,10 +141,15 @@ mod_km4
 How many observations per cluster?
 ```{r}
 
+weather %>% 
+  mutate(cluster = mod_km4$cluster) %>% 
+  group_by(cluster) %>% 
+  tally()
+
 ```
 
-Now how can we visually inspect the resutls of k-means?  
-We can either  
+Now, how can we visually inspect the results of k-means?  
+**Ans:** We can either:
 
 - add the cluster column to original dataset and explore the distribution of each variable against cluster id, OR  
 
@@ -158,6 +180,10 @@ We could actually run ANOVA models for each original variable of the form
 and extract cluster mean and pairwise comparison to understand what variables had significant differences among clusters.  
 
 ```{r kmeans PCA plot}
+fviz_cluster(mod_km4,
+             data = weather_norm
+             )
+
 
 ```
   

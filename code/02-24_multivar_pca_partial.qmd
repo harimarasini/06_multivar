@@ -244,7 +244,7 @@ weather %>%
              y = sum_prcp.mm_Oct)) +
   geom_point() +
   geom_smooth(method="lm") #+
-  stat_correlation(weather)
+  stat_correlation()
 
 
 ```
@@ -337,7 +337,7 @@ lm_dayl.apr %>%
 What has happened with **mean_dayl.s_April** and **sum_prcp.mm_Oct** estimates and standard error when modeled i) alone, or with another uncorrelated variable vs. ii) with another correlated variable?
 
 **ANS:**
-- for model 1 and model with uncorrelated variable, magnitude and direction didn't change, no relationship
+- For model 1 and model with uncorrelated variable, magnitude and direction didn't change, no relationship
 
 - magnitude and direction changes when model includes variable with highly correlated variable (multicollinearity is seen)
 - error around the estimate highly changed
@@ -469,16 +469,17 @@ mod_pca %>%
   geom_bar(stat = "Identity") +
   geom_hline(yintercept = 70, linetype = 2, color = "red")
 
-
 ```
+    
     
 We would need 4 PCs.  
 Normally we wish to use 2-3 PCs, but 4 is certainly better than 72 original variables.  
 
 ## Inspecting PCs  
-Let's inspect PC1 through the loadings (weights) of each variable towards it.  
+Lets inspect PC1 through the loadings (weights) of each variable towards it.  
 
 What are the weights that each variable received in this PC?  
+
 ```{r PC1 weights}
 mod_pca$rotation %>%
   as.data.frame() %>%
@@ -617,7 +618,8 @@ In this exercise, we covered:
   - PCA for dimensionality reduction  
   - How to validate results from PCA   
 
-
+**WHY PCA**
+**- to reduce dimensionality and to check if PCs are orthogonal (or to check multicollinerality)**
 
 
   
